@@ -80,7 +80,7 @@ class Html
         self::$xpath = new \DOMXPath($dom);
         $node = $dom->getElementsByTagName('body');
 
-        self::parseNode($node->item(0), $element);
+        self::parseNode($node->item(0), $element, isset($options['styles']) ? $options['styles'] : array());
         libxml_disable_entity_loader($orignalLibEntityLoader);
     }
 
