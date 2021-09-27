@@ -619,6 +619,7 @@ class HtmlTest extends AbstractWebServerEmbeddedTest
 
         $baseXpath = '/w:document/w:body/w:p/w:r';
         $this->assertTrue($doc->elementExists($baseXpath . '/w:t'));
+        $this->assertFalse($doc->elementExists($baseXpath . '/w:pict/v:shape'));
     }
 
     public function testParseLink()

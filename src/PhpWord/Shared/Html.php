@@ -873,7 +873,7 @@ class Html
             try {
                 $newElement = $element->addImage($src, $style);
             } catch (InvalidImageException $ex) {
-                $newElement = $element->addText($src);
+                $newElement = $element->addText("Error: Could not load image: {$src}");
             }
         } else {
             throw new \Exception("Could not load image $src");
