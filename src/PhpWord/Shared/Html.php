@@ -972,15 +972,11 @@ class Html
 
         if (is_file($src)) {
             try {
-                $newElement = $element->addImage($src, $style);
+                return $element->addImage($src, $style);
             } catch (InvalidImageException $ex) {
-                $newElement = $element->addText("Error: Could not load image: {$src}");
             }
-        } else {
-            throw new \Exception("Could not load image $src");
         }
-
-        return $newElement;
+        return $element->addText("Error: Could not load image: {$src}");
     }
 
     /**

@@ -27,6 +27,7 @@ use PhpOffice\PhpWord\SimpleType\LineSpacingRule;
 use PhpOffice\PhpWord\Style\Paragraph;
 use PhpOffice\PhpWordTests\AbstractWebServerEmbeddedTest;
 use PhpOffice\PhpWordTests\TestHelperDOCX;
+use PHPUnit\Framework\Assert;
 
 /**
  * Test class for PhpOffice\PhpWord\Shared\Html.
@@ -788,7 +789,7 @@ HTML;
      */
     public function testParseRemoteImage(): void
     {
-        $src = self::getRemoteImageUrl();
+        $src = 'http://php.net/images/logos/new-php-logo.png';
 
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
@@ -845,13 +846,15 @@ HTML;
      */
     public function testCouldNotLoadImage(): void
     {
-        $this->expectException(Exception::class);
         $src = 'https://fakedomain.io/images/firefox.png';
 
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         $html = '<p><img src="' . $src . '" width="150" height="200" style="float: right;"/></p>';
         Html::addHtml($section, $html, false, true);
+
+        $doc = TestHelperDOCX::getDocument($phpWord, 'Word2007');
+        $this->assertStringContainsString("Error: Could not load image: {$src}", $doc->printXml());
     }
 
     public function testParseLink(): void
@@ -1104,27 +1107,25 @@ HTML;
     {
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         $section = $phpWord->addSection();
-        $callable = $this->createPartialMock('stdClass', array('__invoke'));
-        $callable->expects(self::once())
-            ->method('__invoke')
-            ->with(
-                $this->callback(function ($node) {
-                    return $node->tagName === 'testTag' && $node->nodeValue === 'This is a custom test tag.';
-                }),
-                $this->identicalTo($section),
-                $this->equalTo(array(
-                    'font' => array(),
-                    'paragraph' => array(),
-                    'list' => array(),
-                    'table' => array(),
-                    'row' => array(),
-                    'cell' => array(),
-                )),
-                $this->equalTo(array()),
-                $this->equalTo('argument1'),
-                $this->equalTo('argument2')
-            )
-            ->willReturn(3);
+        $wasCalled = false;
+        $callable = function ($node, $element, $styles,  $data, $argument1, $argument2) use ($section, &$wasCalled) {
+                Assert::assertTrue($node->tagName === 'testTag' && $node->nodeValue === 'This is a custom test tag.');
+                Assert::assertEquals([
+                    'font' => [],
+                    'paragraph' => [],
+                    'list' => [],
+                    'table' => [],
+                    'row' => [],
+                    'cell' => [],
+                ],$styles);
+                Assert::assertEquals($section, $element);
+                Assert::assertEquals([], $data);
+                Assert::assertEquals('argument1', $argument1);
+                Assert::assertEquals('argument2', $argument2);
+
+                $wasCalled = true;
+                return 3;
+        };
 
         Html::addUserDefinedNodeMapping(
             'testTag',
@@ -1138,6 +1139,8 @@ HTML;
         );
         $html = '<testTag>This is a custom test tag.</testTag>';
         Html::addHtml($section, $html);
+
+        Assert::assertTrue( $wasCalled);
     }
 
     public function testParseRemoteImageWithoutExtension()
@@ -1169,6 +1172,7 @@ HTML;
         $baseXpath = '/w:document/w:body/w:p/w:r';
         $this->assertTrue($doc->elementExists($baseXpath . '/w:t'));
         $this->assertFalse($doc->elementExists($baseXpath . '/w:pict/v:shape'));
+        $this->assertStringContainsString("Error: Could not load image", $doc->printXml());
     }
 
     /**
@@ -1176,7 +1180,7 @@ HTML;
      */
     public function testParseRemoteSignedImage()
     {
-        $src = 'https://gathertest.imgix.net/Nw/vmfKMPzVP6uolWQG?ar=1%3A1&auto=format%2Ccompress&fit=crop&max-height=800&q=75&s=694c91d545685c82215985a09bda7d05';
+        $src = 'https://assets.gathercontent.com/NDE5OTE/K4bo66QB3XovuuoT?Fill=solid&fill-color=0FFF&fit=fillmax&fm=png&h=300&w=300&s=87c9969984c632070d85da8d4648049b';
 
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         $section = $phpWord->addSection();
@@ -1187,6 +1191,5 @@ HTML;
 
         $baseXpath = '/w:document/w:body/w:p/w:r';
         $this->assertTrue($doc->elementExists($baseXpath . '/w:pict/v:shape'));
-
     }
 }
