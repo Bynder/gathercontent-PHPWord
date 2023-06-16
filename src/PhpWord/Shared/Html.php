@@ -953,7 +953,7 @@ class Html
                     $contentType = get_headers($src, 1)['Content-Type'];
 
                     if (!array_key_exists($contentType, self::$contentTypeFileExtensionMap)) {
-                        throw new \Exception("Could not load image $src");
+                        return $element->addText("Error: Could not load image: {$src}");
                     }
 
                     $match[1] = self::$contentTypeFileExtensionMap[$contentType];
