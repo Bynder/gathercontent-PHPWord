@@ -17,7 +17,6 @@
 
 namespace PhpOffice\PhpWordTests\Shared;
 
-use Exception;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\Table;
 use PhpOffice\PhpWord\PhpWord;
@@ -854,7 +853,7 @@ HTML;
         Html::addHtml($section, $html, false, true);
 
         $doc = TestHelperDOCX::getDocument($phpWord, 'Word2007');
-        $this->assertStringContainsString("Error: Could not load image: {$src}", $doc->printXml());
+        self::assertStringContainsString("Error: Could not load image: {$src}", $doc->printXml());
     }
 
     public function testParseLink(): void
@@ -1103,28 +1102,29 @@ HTML;
         self::assertIsObject($doc);
     }
 
-    public function testAddUserDefinedFunction()
+    public function testAddUserDefinedFunction(): void
     {
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         $section = $phpWord->addSection();
         $wasCalled = false;
-        $callable = function ($node, $element, $styles,  $data, $argument1, $argument2) use ($section, &$wasCalled) {
-                Assert::assertTrue($node->tagName === 'testTag' && $node->nodeValue === 'This is a custom test tag.');
-                Assert::assertEquals([
-                    'font' => [],
-                    'paragraph' => [],
-                    'list' => [],
-                    'table' => [],
-                    'row' => [],
-                    'cell' => [],
-                ],$styles);
-                Assert::assertEquals($section, $element);
-                Assert::assertEquals([], $data);
-                Assert::assertEquals('argument1', $argument1);
-                Assert::assertEquals('argument2', $argument2);
+        $callable = function ($node, $element, $styles, $data, $argument1, $argument2) use ($section, &$wasCalled) {
+            Assert::assertTrue($node->tagName === 'testTag' && $node->nodeValue === 'This is a custom test tag.');
+            Assert::assertEquals([
+                'font' => [],
+                'paragraph' => [],
+                'list' => [],
+                'table' => [],
+                'row' => [],
+                'cell' => [],
+            ], $styles);
+            Assert::assertEquals($section, $element);
+            Assert::assertEquals([], $data);
+            Assert::assertEquals('argument1', $argument1);
+            Assert::assertEquals('argument2', $argument2);
 
-                $wasCalled = true;
-                return 3;
+            $wasCalled = true;
+
+            return 3;
         };
 
         Html::addUserDefinedNodeMapping(
@@ -1140,13 +1140,13 @@ HTML;
         $html = '<testTag>This is a custom test tag.</testTag>';
         Html::addHtml($section, $html);
 
-        Assert::assertTrue( $wasCalled);
+        Assert::assertTrue($wasCalled);
     }
 
-    public function testParseRemoteImageWithoutExtension()
+    public function testParseRemoteImageWithoutExtension(): void
     {
         // annoyingly I have to use a valid URL to get to the code I need to test, otherwise file_get_contents fails.
-        $src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTABbXr4i-QODqhy7tofHYmTYh05rYPktzacw&amp;usqp=CAU";
+        $src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTABbXr4i-QODqhy7tofHYmTYh05rYPktzacw&amp;usqp=CAU';
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         $section = $phpWord->addSection();
         $html = '<p><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTABbXr4i-QODqhy7tofHYmTYh05rYPktzacw&amp;usqp=CAU" data-id="null" alt="How a Random Image can help you to generate creative ideas" title=""/></p>';
@@ -1155,10 +1155,10 @@ HTML;
         $doc = TestHelperDOCX::getDocument($phpWord, 'Word2007');
 
         $baseXpath = '/w:document/w:body/w:p/w:r';
-        $this->assertTrue($doc->elementExists($baseXpath . '/w:pict/v:shape'));
+        self::assertTrue($doc->elementExists($baseXpath . '/w:pict/v:shape'));
     }
 
-    public function testExternalImageSourceNotFound()
+    public function testExternalImageSourceNotFound(): void
     {
         $src = 'https://www.bridgewatersavings.com/assets/1442845771-FDIC.png'; // returns 404
 
@@ -1170,15 +1170,15 @@ HTML;
         $doc = TestHelperDOCX::getDocument($phpWord, 'Word2007');
 
         $baseXpath = '/w:document/w:body/w:p/w:r';
-        $this->assertTrue($doc->elementExists($baseXpath . '/w:t'));
-        $this->assertFalse($doc->elementExists($baseXpath . '/w:pict/v:shape'));
-        $this->assertStringContainsString("Error: Could not load image", $doc->printXml());
+        self::assertTrue($doc->elementExists($baseXpath . '/w:t'));
+        self::assertFalse($doc->elementExists($baseXpath . '/w:pict/v:shape'));
+        self::assertStringContainsString('Error: Could not load image', $doc->printXml());
     }
 
     /**
-     * Test parsing of remote img with signed url
+     * Test parsing of remote img with signed url.
      */
-    public function testParseRemoteSignedImage()
+    public function testParseRemoteSignedImage(): void
     {
         $src = 'https://assets.gathercontent.com/NDE5OTE/K4bo66QB3XovuuoT?Fill=solid&fill-color=0FFF&fit=fillmax&fm=png&h=300&w=300&s=87c9969984c632070d85da8d4648049b';
 
@@ -1190,6 +1190,6 @@ HTML;
         $doc = TestHelperDOCX::getDocument($phpWord, 'Word2007');
 
         $baseXpath = '/w:document/w:body/w:p/w:r';
-        $this->assertTrue($doc->elementExists($baseXpath . '/w:pict/v:shape'));
+        self::assertTrue($doc->elementExists($baseXpath . '/w:pict/v:shape'));
     }
 }

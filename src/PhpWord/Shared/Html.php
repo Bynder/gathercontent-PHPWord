@@ -21,7 +21,6 @@ use DOMAttr;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
-use Exception;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\Row;
 use PhpOffice\PhpWord\Element\Table;
@@ -50,6 +49,7 @@ class Html
     protected static $css;
 
     protected static $userDefinedNodeMappings = [];
+
     protected static $contentTypeFileExtensionMap = [
         'image/svg+xml' => 'svg',
         'image/jpeg' => 'jpg',
@@ -211,8 +211,9 @@ class Html
         }
 
         $nodes = self::getNodeMappingTable($node, $element, $styles, $data);
-        array_map(function ($argumentList, $markTag) use ($node, $element, $styles, $data, &$nodes) {
-            $nodes[$markTag] = array(
+        array_map(
+            function ($argumentList, $markTag) use ($node, $element, $styles, $data, &$nodes): void {
+            $nodes[$markTag] = [
                 0 => $argumentList['method'],
                 1 => $argumentList['withNode'] ? $node : null,
                 2 => $argumentList['withElement'] ? $element : null,
@@ -220,9 +221,10 @@ class Html
                 4 => $argumentList['withData'] ? $data : null,
                 5 => $argumentList['argument1'],
                 6 => $argumentList['argument2'],
-            );
+            ];
         },
-            self::$userDefinedNodeMappings, array_keys(self::$userDefinedNodeMappings)
+            self::$userDefinedNodeMappings,
+            array_keys(self::$userDefinedNodeMappings)
         );
 
         $newElement = null;
@@ -976,6 +978,7 @@ class Html
             } catch (InvalidImageException $ex) {
             }
         }
+
         return $element->addText("Error: Could not load image: {$src}");
     }
 
@@ -1158,7 +1161,6 @@ class Html
         // - repeated text, e.g. underline "_", because of unpredictable line wrapping
     }
 
-
     /**
      * Add a custom mapping for HTML tag.
      *
@@ -1171,10 +1173,16 @@ class Html
      * @param string $argument2
      * @param callable|string $method
      */
-    public static function addUserDefinedNodeMapping($htmlTag, $withNode, $withElement, $withStyles, $withData, $argument1, $argument2, $method)
+    public static function addUserDefinedNodeMapping($htmlTag, $withNode, $withElement, $withStyles, $withData, $argument1, $argument2, $method): void
     {
         $args = compact(
-            'withNode', 'withElement', 'withStyles', 'withData', 'argument1', 'argument2', 'method'
+            'withNode',
+            'withElement',
+            'withStyles',
+            'withData',
+            'argument1',
+            'argument2',
+            'method'
         );
         self::$userDefinedNodeMappings[$htmlTag] = $args;
     }
@@ -1215,5 +1223,4 @@ class Html
             'hr' => ['HorizRule',   $node,  $element,   $styles,    null,   null,           null],
         ];
     }
-
 }
