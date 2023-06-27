@@ -213,16 +213,16 @@ class Html
         $nodes = self::getNodeMappingTable($node, $element, $styles, $data);
         array_map(
             function ($argumentList, $markTag) use ($node, $element, $styles, $data, &$nodes): void {
-            $nodes[$markTag] = [
-                0 => $argumentList['method'],
-                1 => $argumentList['withNode'] ? $node : null,
-                2 => $argumentList['withElement'] ? $element : null,
-                3 => $argumentList['withStyles'] ? $styles : null,
-                4 => $argumentList['withData'] ? $data : null,
-                5 => $argumentList['argument1'],
-                6 => $argumentList['argument2'],
-            ];
-        },
+                $nodes[$markTag] = [
+                    0 => $argumentList['method'],
+                    1 => $argumentList['withNode'] ? $node : null,
+                    2 => $argumentList['withElement'] ? $element : null,
+                    3 => $argumentList['withStyles'] ? $styles : null,
+                    4 => $argumentList['withData'] ? $data : null,
+                    5 => $argumentList['argument1'],
+                    6 => $argumentList['argument2'],
+                ];
+            },
             self::$userDefinedNodeMappings,
             array_keys(self::$userDefinedNodeMappings)
         );
