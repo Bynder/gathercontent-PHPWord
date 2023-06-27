@@ -8,7 +8,6 @@ Desktop.ini
 _build
 /build
 phpunit.xml
-composer.lock
 composer.phar
 vendor
 /report
@@ -21,3 +20,4 @@ phpword.ini
 /.project
 /nbproject
 /.php_cs.cache
+/.phpunit.result.cache

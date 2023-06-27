@@ -192,11 +192,11 @@ You can also specify the status of the spell and grammar checks, marking spellin
 
 .. code-block:: php
 
-    $proofState = new ProofState();
-    $proofState->setGrammar(ProofState::CLEAN);
-    $proofState->setSpelling(ProofState::DIRTY);
+    $proofState = new \PhpOffice\PhpWord\ComplexType\ProofState();
+    $proofState->setGrammar(\PhpOffice\PhpWord\ComplexType\ProofState::CLEAN);
+    $proofState->setSpelling(\PhpOffice\PhpWord\ComplexType\ProofState::DIRTY);
 
-    $phpWord->getSettings()->setProofState(proofState);
+    $phpWord->getSettings()->setProofState($proofState);
 
 Track Revisions
 ~~~~~~~~~~~~~~~
@@ -228,7 +228,7 @@ The default language of the document can be change with the following.
     $phpWord->getSettings()->setThemeFontLang(new Language(Language::FR_BE));
 
 ``Language`` has 3 parameters, one for Latin languages, one for East Asian languages and one for Complex (Bi-Directional) languages.
-A couple of language codes are provided in the ``PhpOffice\PhpWord\ComplexType\Language`` class but any valid code/ID can be used.
+A couple of language codes are provided in the ``PhpOffice\PhpWord\Style\Language`` class but any valid code/ID can be used.
 
 In case you are generating an RTF document the language need to be set differently.
 
